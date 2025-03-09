@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import auth from "../firebase/firebase.init";
 import { useState } from "react";
 
@@ -6,33 +6,47 @@ import { useState } from "react";
 
 const Login = () => {
 
-    const provider= new GoogleAuthProvider();
+    const providerGoogle = new GoogleAuthProvider();
+    const providerGithub= new GithubAuthProvider();
 
-    const [user, setUser]=useState(null);
+    const [user, setUser] = useState(null);
 
-    const handleLogin=()=>{
+    const handleLogin = () => {
 
-        signInWithPopup(auth, provider)
+        signInWithPopup(auth, providerGoogle)
+            .then((result) => {
+                console.log(result.user);
+                setUser(result.user)
+            })
+            .catch(error => {
+                console.log("Error", error);
+                setUser(null);
+            })
+
+    }
+
+    const handleGithub=()=>{
+        signInWithPopup(auth,providerGithub)
         .then((result)=>{
-            console.log(result.user);
+            console.log(result)
             setUser(result.user)
         })
         .catch(error=>{
-            console.log("Error", error);
+            console.log('Error',error);
             setUser(null);
         })
 
     }
 
-    const handleSignOut=()=>{
+    const handleSignOut = () => {
         signOut(auth)
-        .then(()=>{
-            console.log('sign out done');
-            setUser(null);
-        })
-        .catch((error)=>{
-            console.log('Error',error);
-        })
+            .then(() => {
+                console.log('sign out done');
+                setUser(null);
+            })
+            .catch((error) => {
+                console.log('Error', error);
+            })
     }
 
 
@@ -40,8 +54,15 @@ const Login = () => {
     return (
         <div style={{ textAlign: 'center', marginTop: "50px" }}>
 
-            <button onClick={handleLogin}>Login With Google</button>
-            <button onClick={handleSignOut}>Sign Out</button>
+            {
+                user ? <button onClick={handleSignOut}>Sign Out</button>
+                    :
+                    <>
+                    <button onClick={handleLogin}>Login With Google</button>
+                    <button onClick={handleGithub}>Login With Github</button>
+                    </>
+            }
+
 
             {
                 user && <div>
